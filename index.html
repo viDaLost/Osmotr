@@ -1,42 +1,373 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Осмотр модели</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ростислав & Валида — Свадебное приглашение</title>
     
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        burgundy: '#6B1D2F',
+                        olive: '#606C38',
+                        ivory: '#FDFBF7',
+                        softblack: '#1A1A1A'
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #e0e0e0; /* Приятный серый фон */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
+        /* Сглаженные анимации для мобильных устройств */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        
+        /* Скролл-анимации появления контента */
+        .reveal {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: transform, opacity;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        model-viewer {
-            width: 100%;
-            height: 100%;
-            /* Убираем стандартную рамку при клике */
-            outline: none;
+        /* Кастомный оверлей для мобильного меню */
+        #mobile-menu {
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        #mobile-menu.open {
+            opacity: 1;
+            visibility: visible;
         }
     </style>
 </head>
-<body>
+<body class="bg-ivory text-softblack font-sans antialiased overflow-x-hidden">
 
-    <model-viewer 
-        src="Untitled.glb" 
-        camera-controls 
-        shadow-intensity="1.5"
-        shadow-softness="1"
-        environment-image="neutral"
-        auto-rotate>
-    </model-viewer>
+    <header class="fixed top-0 left-0 w-full z-50 bg-ivory/90 backdrop-blur-md border-b border-burgundy/5">
+        <div class="max-w-6xl mx-auto px-5 py-4 flex justify-between items-center">
+            <a href="#" class="font-serif text-lg tracking-widest text-burgundy font-semibold">R & V</a>
+            
+            <nav class="hidden md:flex space-x-8 text-xs uppercase tracking-widest font-medium text-softblack/70">
+                <a href="#wedding" class="hover:text-burgundy transition-colors">Свадьба</a>
+                <a href="#story" class="hover:text-burgundy transition-colors">Наша История</a>
+                <a href="#dresscode" class="hover:text-burgundy transition-colors">Дресс-код</a>
+                <a href="#gifts" class="hover:text-burgundy transition-colors">Подарки</a>
+                <a href="#rsvp" class="hover:text-burgundy transition-colors">RSVP</a>
+            </nav>
 
+            <button id="menu-toggle" class="block md:hidden text-burgundy focus:outline-none z-50" aria-label="Открыть меню">
+                <svg id="menu-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                    <line x1="4" y1="6" x2="20" y2="6" id="line1" class="transition-transform duration-300"></line>
+                    <line x1="4" y1="12" x2="20" y2="12" id="line2" class="transition-opacity duration-300"></line>
+                    <line x1="4" y1="18" x2="20" y2="18" id="line3" class="transition-transform duration-300"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div id="mobile-menu" class="fixed inset-0 bg-ivory z-40 flex flex-col justify-center items-center opacity-0 visibility-hidden md:hidden">
+        <nav class="flex flex-col space-y-6 text-center text-lg uppercase tracking-widest font-light text-softblack">
+            <a href="#wedding" class="mobile-link hover:text-burgundy transition-colors font-serif">Свадьба</a>
+            <a href="#story" class="mobile-link hover:text-burgundy transition-colors font-serif">Наша История</a>
+            <a href="#dresscode" class="mobile-link hover:text-burgundy transition-colors font-serif">Дресс-код</a>
+            <a href="#gifts" class="mobile-link hover:text-burgundy transition-colors font-serif">Подарки</a>
+            <a href="#rsvp" class="mobile-link hover:text-burgundy transition-colors font-serif text-burgundy font-normal">Подтверждение</a>
+        </nav>
+    </div>
+
+    <section class="relative min-h-screen flex flex-col justify-center items-center px-5 pt-20 text-center overflow-hidden">
+        <div class="absolute inset-0 flex justify-center items-center opacity-[0.03] pointer-events-none select-none">
+            <svg width="280" height="280" viewBox="0 0 100 100" fill="none" stroke="#6B1D2F" stroke-width="0.5">
+                <circle cx="50" cy="50" r="45" />
+                <path d="M50,5 L50,95 M5,50 L95,50" />
+            </svg>
+        </div>
+
+        <div class="z-10 max-w-xl mx-auto animate-fade-in-up">
+            <div class="mb-5 inline-block">
+                <svg width="55" height="55" viewBox="0 0 100 100" fill="none" class="text-burgundy">
+                    <path d="M30 20 C 45 10, 55 10, 70 20 C 80 35, 70 65, 50 85 C 30 65, 20 35, 30 20 Z" stroke="currentColor" stroke-width="1.2"/>
+                    <path d="M45 40 H 55 M50 40 V 60" stroke="currentColor" stroke-width="1"/>
+                </svg>
+            </div>
+            
+            <p class="text-[10px] md:text-xs uppercase tracking-[0.25em] text-olive font-semibold mb-3">Приглашение на торжество</p>
+            <h1 class="font-serif text-4xl sm:text-5xl md:text-7xl text-burgundy font-light tracking-wide mb-5 leading-tight px-2">
+                Ростислав <br class="block sm:hidden"> <span class="italic font-normal text-olive">&</span> <br class="block sm:hidden"> Валида
+            </h1>
+            
+            <div class="flex items-center justify-center space-x-3 mb-8">
+                <div class="w-8 h-[1px] bg-burgundy/30"></div>
+                <span class="font-serif italic text-lg text-burgundy">07 июля 2026</span>
+                <div class="w-8 h-[1px] bg-burgundy/30"></div>
+            </div>
+
+            <div class="inline-flex space-x-5 bg-white/60 backdrop-blur-sm border border-burgundy/10 px-6 py-3 rounded-xl shadow-sm">
+                <div class="text-center min-w-[50px]">
+                    <span id="days" class="block font-serif text-2xl md:text-3xl text-burgundy font-medium">27</span>
+                    <span class="text-[9px] uppercase tracking-widest text-softblack/50">Дней</span>
+                </div>
+                <div class="text-center min-w-[50px] border-l border-burgundy/10 pl-5">
+                    <span id="hours" class="block font-serif text-2xl md:text-3xl text-burgundy font-medium">12</span>
+                    <span class="text-[9px] uppercase tracking-widest text-softblack/50">Часов</span>
+                </div>
+                <div class="text-center min-w-[50px] border-l border-burgundy/10 pl-5">
+                    <span id="minutes" class="block font-serif text-2xl md:text-3xl text-burgundy font-medium">45</span>
+                    <span class="text-[9px] uppercase tracking-widest text-softblack/50">Минут</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="wedding" class="py-16 px-5 max-w-md mx-auto reveal">
+        <div class="text-center mb-10">
+            <h2 class="font-serif text-3xl text-burgundy mb-2">Торжество</h2>
+            <p class="text-[10px] uppercase tracking-widest text-olive font-semibold">Где и когда</p>
+            <div class="w-6 h-[1px] bg-burgundy mx-auto mt-3"></div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-white border border-burgundy/5 p-6 rounded-2xl shadow-md shadow-burgundy/[0.01]">
+                <div class="w-10 h-10 bg-ivory flex items-center justify-center rounded-full mb-4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B1D2F" stroke-width="1.5">
+                        <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                </div>
+                <h3 class="font-serif text-xl text-softblack mb-4">Церемония</h3>
+                
+                <div class="space-y-3 text-sm font-light text-softblack/80">
+                    <p class="flex justify-between border-b border-ivory pb-2"><span class="font-medium text-burgundy">Дата:</span> <span>07 июля 2026</span></p>
+                    <p class="flex justify-between border-b border-ivory pb-2"><span class="font-medium text-burgundy">Время:</span> <span>11:00</span></p>
+                    <p class="flex flex-col pt-1"><span class="font-medium text-burgundy mb-1">Место проведения:</span> <span class="italic">Джуца, Ставропольский край, Россия</span></p>
+                </div>
+
+                <a href="https://maps.google.com" target="_blank" class="mt-6 w-full text-center inline-flex justify-center items-center bg-burgundy text-ivory text-xs uppercase tracking-widest py-3 rounded-lg font-medium active:bg-burgundy/90 transition-colors">
+                    Посмотреть на карте
+                    <svg class="ml-2" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="story" class="py-16 bg-white border-y border-burgundy/5 px-5 reveal">
+        <div class="max-w-md mx-auto text-center">
+            <div class="mb-4 inline-block text-olive">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+            </div>
+            <h2 class="font-serif text-3xl text-burgundy mb-6">Наша История</h2>
+            <div class="font-serif italic text-base text-softblack/90 leading-relaxed space-y-5 px-2">
+                <p>«В те дни, когда их пути ещё не пересеклись, а её образ был лишь светлой мечтой, он обращал свои молитвы к небу. Небеса услышали его зов и направили в дальний путь.»</p>
+                <p>«Преодолев тысячи дорог, он прибыл на прекрасный Кавказ — чтобы увидеть её! С трепетом в сердце он предложил ей самое ценное — пройти с ним до самого Рая.»</p>
+                <p>«И она, узрев в этом стечении судеб Божественный промысел, всё обдумав и взвесив, сказала: <span class="text-burgundy font-semibold not-italic">«Да»</span>.»</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="dresscode" class="py-16 px-5 max-w-md mx-auto reveal">
+        <div class="text-center mb-10">
+            <h2 class="font-serif text-3xl text-burgundy mb-2">Дресс-код</h2>
+            <p class="text-[10px] uppercase tracking-widest text-olive font-semibold">Палитра торжества</p>
+            <div class="w-6 h-[1px] bg-burgundy mx-auto mt-3"></div>
+            <p class="text-xs text-softblack/75 mt-4 font-light leading-relaxed">
+                Будем благодарны, если вы выберете наряды в соответствии со свадебной цветовой гаммой:
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 max-w-xs mx-auto">
+            <div class="text-center">
+                <div class="w-16 h-16 rounded-full bg-[#6B1D2F] mx-auto shadow-md border-2 border-white"></div>
+                <p class="text-[11px] font-medium mt-2 text-softblack">Burgundy</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 rounded-full bg-[#606C38] mx-auto shadow-md border-2 border-white"></div>
+                <p class="text-[11px] font-medium mt-2 text-softblack">Olive Green</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 rounded-full bg-[#F5F2EB] mx-auto shadow-md border-2 border-white"></div>
+                <p class="text-[11px] font-medium mt-2 text-softblack">Ivory</p>
+            </div>
+            <div class="text-center">
+                <div class="w-16 h-16 rounded-full bg-[#1A1A1A] mx-auto shadow-md border-2 border-white"></div>
+                <p class="text-[11px] font-medium mt-2 text-softblack">Black</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="gifts" class="py-16 bg-white/60 border-t border-burgundy/5 px-5 reveal">
+        <div class="max-w-md mx-auto text-center bg-ivory border border-burgundy/10 p-6 rounded-2xl shadow-sm">
+            <div class="mb-3 inline-block text-burgundy">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M20 12V8H4v12h16v-4"/>
+                    <path d="M4 8l8 5 8-5"/>
+                </svg>
+            </div>
+            <h2 class="font-serif text-xl text-burgundy mb-3">Пожелания к подаркам</h2>
+            <p class="text-xs font-light leading-relaxed text-softblack/80 mb-4">
+                Мы не сможем в полной мере насладиться красотой живых цветов из-за предстоящего отъезда...
+            </p>
+            <p class="text-xs font-medium text-olive uppercase tracking-wider">
+                Если вы хотите поддержать нас, мы будем признательны за вклад в бюджет нашей молодой семьи.
+            </p>
+        </div>
+    </section>
+
+    <section id="rsvp" class="py-16 px-5 max-w-md mx-auto reveal">
+        <div class="text-center mb-8">
+            <h2 class="font-serif text-3xl text-burgundy mb-2">RSVP</h2>
+            <p class="text-[10px] uppercase tracking-widest text-olive font-semibold">Подтверждение присутствия</p>
+            <p class="text-[11px] text-softblack/60 mt-3">Пожалуйста, заполните форму до <span class="font-semibold text-burgundy">26 июня 2026 года</span></p>
+        </div>
+
+        <form class="space-y-5 bg-white p-6 rounded-2xl border border-burgundy/5 shadow-sm">
+            <div>
+                <label class="block text-[10px] uppercase tracking-widest text-softblack/60 font-medium mb-1.5">Имя *</label>
+                <input type="text" required class="w-full bg-ivory/50 border border-burgundy/10 focus:border-burgundy rounded-lg px-3 py-2.5 text-base outline-none transition-all">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase tracking-widest text-softblack/60 font-medium mb-1.5">Фамилия *</label>
+                <input type="text" required class="w-full bg-ivory/50 border border-burgundy/10 focus:border-burgundy rounded-lg px-3 py-2.5 text-base outline-none transition-all">
+            </div>
+
+            <div>
+                <label class="block text-[10px] uppercase tracking-widest text-softblack/60 font-medium mb-2">Ваше присутствие *</label>
+                <div class="space-y-2">
+                    <label class="flex items-center space-x-3 cursor-pointer text-sm p-1">
+                        <input type="radio" name="presence" value="yes" checked class="w-4 h-4 text-burgundy focus:ring-burgundy">
+                        <span>Я приду</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer text-sm p-1">
+                        <input type="radio" name="presence" value="no" class="w-4 h-4 text-burgundy focus:ring-burgundy">
+                        <span>Не смогу прийти</span>
+                    </label>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] uppercase tracking-widest text-softblack/60 font-medium mb-1.5">Комментарии</label>
+                <textarea rows="3" class="w-full bg-ivory/50 border border-burgundy/10 focus:border-burgundy rounded-lg px-3 py-2.5 text-base outline-none resize-none transition-all" placeholder="Пожелания, аллергии..."></textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-burgundy text-ivory text-xs uppercase tracking-widest font-medium py-3.5 rounded-lg active:scale-[0.99] transition-transform">
+                Отправить ответ
+            </button>
+        </form>
+    </section>
+
+    <section id="photos" class="py-16 bg-gradient-to-b from-white to-ivory border-t border-burgundy/5 px-5 reveal">
+        <div class="max-w-md mx-auto text-center">
+            <h2 class="font-serif text-xl text-burgundy mb-3">Свадебный альбом</h2>
+            <p class="text-xs font-light text-softblack/70 mb-6">
+                Вы сможете поделиться своими кадрами с нашего праздника здесь, либо в соцсетях по хэштегу <span class="font-medium text-burgundy">#RV</span>
+            </p>
+
+            <div class="border-2 border-dashed border-burgundy/20 bg-white/80 rounded-xl p-8 cursor-pointer active:bg-ivory transition-colors">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6B1D2F" stroke-width="1.5" class="mx-auto mb-3">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+                <p class="text-xs font-medium text-softblack">Нажмите, чтобы выбрать фото</p>
+                <p class="text-[10px] text-softblack/40 mt-1">До 30 файлов, размер до 20Mb</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-6 border-t border-burgundy/5 text-center text-[10px] uppercase tracking-widest text-softblack/40">
+        <p>© 2026 Ростислав & Валида</p>
+    </footer>
+
+    <script>
+        // Работа бургер-меню
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+        
+        const line1 = document.getElementById('line1');
+        const line2 = document.getElementById('line2');
+        const line3 = document.getElementById('line3');
+
+        function toggleMenu() {
+            const isOpen = mobileMenu.classList.toggle('open');
+            
+            // Анимация иконки бургера в крестик
+            if (isOpen) {
+                line1.style.transform = 'translateY(6px) rotate(45deg)';
+                line2.style.opacity = '0';
+                line3.style.transform = 'translateY(-6px) rotate(-45deg)';
+                document.body.style.overflow = 'hidden'; // Запрет скролла при открытом меню
+            } else {
+                line1.style.transform = 'none';
+                line2.style.opacity = '1';
+                line3.style.transform = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+
+        menuToggle.addEventListener('click', toggleMenu);
+        mobileLinks.forEach(link => link.addEventListener('click', toggleMenu));
+
+        // Оптимизированный скролл-триггер (Intersection Observer)
+        const reveals = document.querySelectorAll('.reveal');
+        const observerOptions = {
+            root: null,
+            threshold: 0.1,
+            rootMargin: '0px 0px -40px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target); // Появление происходит один раз
+                }
+            });
+        }, observerOptions);
+
+        reveals.forEach(element => observer.observe(element));
+
+        // Таймер обратного отсчета
+        const countdownDate = new Date("July 7, 2026 11:00:00").getTime();
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = countdownDate - now;
+            if (distance < 0) return;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+
+            document.getElementById("days").innerText = days;
+            document.getElementById("hours").innerText = hours;
+            document.getElementById("minutes").innerText = minutes;
+        }
+        setInterval(updateTimer, 60000);
+        updateTimer();
+    </script>
 </body>
 </html>
